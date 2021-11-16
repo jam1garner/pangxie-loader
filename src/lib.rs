@@ -67,7 +67,7 @@ fn read_encrypted_file(c_path: *const c_char) -> *mut FileInfo {
     }
 }
 
-#[skyline::main(name = "file-replacement")]
+#[skyline::main(name = "pangxie-loader")]
 pub fn main() {
     assert_eq!(std::mem::size_of::<FileInfo>(), 0x18);
     install_hook!(read_encrypted_file);
