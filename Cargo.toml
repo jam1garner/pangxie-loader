@@ -12,6 +12,9 @@ crate-type = ["cdylib"]
 
 [dependencies]
 skyline = { git = "https://github.com/ultimate-research/skyline-rs.git" }
+tegra_swizzle = "0.1"
+image = "0.23.14"
+binrw = "0.8.0"
 
 [profile.dev]
 panic = "abort"

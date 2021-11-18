@@ -9,6 +9,8 @@ use std::{
 
 use skyline::install_hook;
 
+mod tegra_dds;
+
 #[repr(C)]
 struct FileInfo {
     file_data_ptr: *const u8,
@@ -24,8 +26,22 @@ struct FileInfo {
 /// If the file does not exist, this returns `None`
 /// If the file does exist, this returns a Vec containing the contents of the file
 fn read_file(game_path: &str, mod_folder: &Path) -> Option<Vec<u8>> {
-    let mod_path = Path::new(mod_folder).join(game_path.strip_prefix("spel2:/")?);
-    fs::read(&mod_path).ok()
+    if game_path.ends_with(".DDS") {
+        let game_path = game_path.replace("TexturesNX", "Textures");
+        let mut mod_path = Path::new(mod_folder).join(game_path.strip_prefix("spel2:/")?);
+        mod_path.set_extension("png");
+
+        if mod_path.exists() {
+            println!("Converting {:?} to Spelunky DDS...", mod_path);
+
+            tegra_dds::from_image(image::open(&mod_path).ok()?)
+        } else {
+            None
+        }
+    } else {
+        let mod_path = Path::new(mod_folder).join(game_path.strip_prefix("spel2:/")?);
+        fs::read(&mod_path).ok()
+    }
 }
 
 #[skyline::hook(offset = 0x31db90)]
