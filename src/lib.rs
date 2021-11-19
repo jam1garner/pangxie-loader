@@ -7,7 +7,8 @@ use std::{
     slice,
 };
 
-use skyline::install_hook;
+use rlua::{Lua, Variadic};
+use skyline::{install_hook, libc};
 
 mod tegra_dds;
 
@@ -83,8 +84,40 @@ fn read_encrypted_file(c_path: *const c_char) -> *mut FileInfo {
     }
 }
 
+static mut REENT_IGNORE_ME: [u8; 0x2000] = [0; 0x2000];
+
+#[export_name = "__getreent"]
+unsafe extern "C" fn fake_get_reent() -> *mut u8 {
+    REENT_IGNORE_ME.as_mut_ptr()
+}
+
+#[export_name = "__errno"]
+unsafe extern "C" fn get_errno() -> *const i64 {
+    libc::errno_loc()
+}
+
 #[skyline::main(name = "pangxie-loader")]
 pub fn main() {
     assert_eq!(std::mem::size_of::<FileInfo>(), 0x18);
     install_hook!(read_encrypted_file);
+
+    let lua = Lua::new();
+
+    lua.context(|lua_ctx| {
+        let globals = lua_ctx.globals();
+
+        let print = lua_ctx.create_function(|_, strings: Variadic<String>| {
+            for string in strings.iter() {
+                print!("{} ", string);
+            }
+            println!();
+            Ok(())
+        })?;
+
+        globals.set("print", print)?;
+
+        lua_ctx.load(r#"print("test" .. "123")"#).eval::<()>()?;
+
+        Ok::<_, rlua::Error>(())
+    });
 }

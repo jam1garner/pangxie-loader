@@ -1,0 +1,2 @@
+[env]
+CC_aarch64_skyline_switch = "aarch64-none-elf-gcc"
