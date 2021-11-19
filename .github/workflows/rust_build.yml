@@ -21,6 +21,7 @@ jobs:
         PATH=$PATH:/root/.cargo/bin /root/.cargo/bin/cargo-skyline skyline build --release
       env:
         HOME: /root
+        CC_aarch64_skyline_switch: aarch64-none-elf-gcc
     - name: Upload plugin artifact
       uses: actions/upload-artifact@v2
       with:
