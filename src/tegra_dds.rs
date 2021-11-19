@@ -24,11 +24,11 @@ pub(crate) fn from_image(img: DynamicImage) -> Option<Vec<u8>> {
     for pixel in img.pixels_mut() {
         let channels = pixel.channels_mut();
 
-        if channels[3] == 0 {
-            channels[0] = 0;
-            channels[1] = 0;
-            channels[2] = 0;
-        }
+        let alpha = (channels[3] as f32) / 255.0;
+
+        channels[0] = ((channels[0] as f32) * alpha) as _;
+        channels[1] = ((channels[1] as f32) * alpha) as _;
+        channels[2] = ((channels[2] as f32) * alpha) as _;
     }
 
     let (width, height) = (img.width() as usize, img.height() as usize);
