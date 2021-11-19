@@ -31,6 +31,14 @@ cargo skyline build --release
 1. Copy skyline (`subsdk9` and `main.npdm`) to `sd:/atmosphere/contents/01007EC013ABC000/exefs`
 2. Copy `libpangxie_loader.nro` to `sd:/atmosphere/contents/01007EC013ABC000/romfs/skyline/plugins`
 
+(Alternatively use `cargo skyline install` to install from source)
+
+#### Run With Logging
+
+```
+cargo skyline run
+```
+
 ## Add Mods
 
 Mods go into `sd:/spelunky2/mods`, with each subfolder representing a modpack, similar to modlunky.
