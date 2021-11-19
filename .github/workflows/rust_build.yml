@@ -13,7 +13,7 @@ jobs:
       PLUGIN_NAME: pangxie_loader # CHANGE THIS TO THE NAME OF YOUR TEMPLATE!
     runs-on: ubuntu-latest
     container: 
-      image: jugeeya/cargo-skyline:2.1.0
+      image: jugeeya/cargo-skyline:2.1.0-dkp
     steps:
     - uses: actions/checkout@v2
     - name: Build release NRO
