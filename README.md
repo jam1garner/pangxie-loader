@@ -2,6 +2,9 @@
 
 A crabby modloader for Spelunky 2 on the Switch.
 
+Only supports Switch version 1.25, but significantly motivated and skilled parties could quite easily port
+to new versions by updating the offset on `src/lib.rs` line 65.
+
 Latest downloads can be found in [Releases](https://github.com/jam1garner/pangxie-loader/releases).
 
 ## Build From Source
