@@ -7,7 +7,6 @@ use std::{
     slice,
 };
 
-use rlua::{Lua, Variadic};
 use skyline::{install_hook, libc};
 
 mod tegra_dds;
@@ -45,12 +44,30 @@ fn read_file(game_path: &str, mod_folder: &Path) -> Option<Vec<u8>> {
     }
 }
 
+fn read_any_file(game_path: &str, mods_folder: &Path) -> Option<Vec<u8>> {
+    for mod_folder in fs::read_dir(mods_folder).unwrap() {
+        if let Ok(mod_folder) = mod_folder {
+            if mod_folder
+                .file_type()
+                .map(|kind| kind.is_dir())
+                .unwrap_or(false)
+            {
+                if let data @ Some(_) = read_file(game_path, &mod_folder.path()) {
+                    return data;
+                }
+            }
+        }
+    }
+
+    None
+}
+
 #[skyline::hook(offset = 0x31db90)]
 fn read_encrypted_file(c_path: *const c_char) -> *mut FileInfo {
     let path = unsafe { CStr::from_ptr(c_path) }.to_string_lossy();
     println!("loading path: {:?}", path);
 
-    if let Some(file_data) = read_file(&path, &Path::new("sd:/spelunky2/mods/my_mod")) {
+    if let Some(file_data) = read_any_file(&path, &Path::new("sd:/spelunky2/mods")) {
         println!("Loading mod...");
         let file_len = file_data.len();
         let allocation_size = file_len + mem::size_of::<FileInfo>();
@@ -100,24 +117,4 @@ unsafe extern "C" fn get_errno() -> *const i64 {
 pub fn main() {
     assert_eq!(std::mem::size_of::<FileInfo>(), 0x18);
     install_hook!(read_encrypted_file);
-
-    let lua = Lua::new();
-
-    lua.context(|lua_ctx| {
-        let globals = lua_ctx.globals();
-
-        let print = lua_ctx.create_function(|_, strings: Variadic<String>| {
-            for string in strings.iter() {
-                print!("{} ", string);
-            }
-            println!();
-            Ok(())
-        })?;
-
-        globals.set("print", print)?;
-
-        lua_ctx.load(r#"print("test" .. "123")"#).eval::<()>()?;
-
-        Ok::<_, rlua::Error>(())
-    });
 }
