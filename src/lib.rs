@@ -62,7 +62,7 @@ fn read_any_file(game_path: &str, mods_folder: &Path) -> Option<Vec<u8>> {
     None
 }
 
-#[skyline::hook(offset = 0x31db90)]
+#[skyline::hook(offset = 0x31f5e0)]
 fn read_encrypted_file(c_path: *const c_char) -> *mut FileInfo {
     let path = unsafe { CStr::from_ptr(c_path) }.to_string_lossy();
     println!("loading path: {:?}", path);
